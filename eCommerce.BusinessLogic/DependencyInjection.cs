@@ -9,7 +9,7 @@ namespace eCommerce.BusinessLogic
         public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
         {
             // Register business logic services here
-            services.AddSingleton<IProductsService, ProductsService>();
+            services.AddScoped<IProductsService, ProductsService>();
             return services;
         }
     }

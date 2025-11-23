@@ -1,39 +1,74 @@
-﻿using eCommerce.BusinessLogic.DTO;
+﻿using AutoMapper;
+using eCommerce.BusinessLogic.DTO;
 using eCommerce.BusinessLogic.ServiceContracts;
 using eCommerce.DataAccess.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using eCommerce.DataAccess.RepositoryContracts;
 
 namespace eCommerce.BusinessLogic.Services
 {
     internal class ProductsService : IProductsService
     {
-        public Task<ProductResponse> AddProduct(ProductAddRequest product)
+        private readonly IProductsRepository _productsRepository;
+        private readonly IMapper _mapper;
+
+        public ProductsService(IProductsRepository productsRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _productsRepository = productsRepository;
+            _mapper = mapper;
         }
 
-        public Task<bool> DeleteProduct(Guid productId)
+        public async Task<List<ProductResponse>> GetProducts()
         {
-            throw new NotImplementedException();
+            List<Product> products = await _productsRepository.GetProducts();
+
+            return products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
         }
 
-        public Task<ProductResponse> GetProductByCondition(string condition)
+        public async Task<ProductResponse?> GetProductById(Guid id)
         {
-            throw new NotImplementedException();
+            Product? product = await _productsRepository.GetProductById(id);
+
+            if (product is null)
+            {
+                return null;
+            }
+            
+            return _mapper.Map<ProductResponse>(product);
         }
 
-        public Task<List<ProductResponse>> GetProducts()
+        public async Task<ProductResponse?> GetProductByCondition(string condition)
         {
-            throw new NotImplementedException();
+            Product? product = await _productsRepository.GetProductByCondition(condition);
+
+            if (product is null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<ProductResponse>(product);
         }
 
-        public Task<ProductResponse> UpdateProduct(ProductUpdateRequest product)
+
+        public async Task<ProductResponse> AddProduct(ProductAddRequest product)
         {
-            throw new NotImplementedException();
+            var productEntity = _mapper.Map<Product>(product);
+
+            await _productsRepository.AddProduct(productEntity);
+            return _mapper.Map<ProductResponse>(productEntity);
         }
+
+        public async Task<ProductResponse> UpdateProduct(ProductUpdateRequest product)
+        {
+            var updatedProductEntity = _mapper.Map<Product>(product);
+            await _productsRepository.UpdateProduct(updatedProductEntity);
+
+            return _mapper.Map<ProductResponse>(updatedProductEntity);
+        }
+
+        public async Task<bool> DeleteProduct(Guid productId)
+        {
+            bool success = await _productsRepository.DeleteProduct(productId);
+            return success;
+        }        
     }
 }

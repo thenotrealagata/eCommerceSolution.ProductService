@@ -12,33 +12,32 @@ namespace eCommerce.DataAccess.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Product> AddProduct(Product product)
+        public async Task<List<Product>> GetProducts()
         {
-            // TODO set Guid?
-            _dbContext.Products.Add(product);
-            await _dbContext.SaveChangesAsync();
-            return product;
+            var products = await _dbContext.Products.ToListAsync();
+
+            return products;
         }
 
-        public async Task<Boolean> DeleteProduct(Guid productId)
+        public async Task<Product?> GetProductById(Guid id)
         {
-            Product? product = await _dbContext.Products.FindAsync(productId);
-
+            Product? product = await _dbContext.Products.FindAsync(id);
+            
             if (product is null)
             {
-                return false;
+                return null;
             }
 
-            _dbContext.Products.Remove(product);
-            await _dbContext.SaveChangesAsync();
-            return true;
+            return product;
         }
 
         public async Task<Product?> GetProductByCondition(string condition)
         {
-            Product? product = await _dbContext.Products.FirstOrDefaultAsync(p => 
+            // TODO fix
+            Product? product = await _dbContext.Products.Where(p =>
                 p.ProductName.Contains(condition, StringComparison.CurrentCultureIgnoreCase) ||
-                p.Category.Contains(condition, StringComparison.CurrentCultureIgnoreCase));
+                    p.Category.Contains(condition, StringComparison.CurrentCultureIgnoreCase)
+                ).FirstAsync();
 
             if (product is null)
             {
@@ -48,11 +47,11 @@ namespace eCommerce.DataAccess.Repositories
             return product;
         }
 
-        public async Task<List<Product>> GetProducts()
+        public async Task<Product> AddProduct(Product product)
         {
-            var products = await _dbContext.Products.ToListAsync();
-
-            return products;
+            _dbContext.Products.Add(product);
+            await _dbContext.SaveChangesAsync();
+            return product;
         }
 
         public async Task<Product?> UpdateProduct(Product product)
@@ -72,6 +71,20 @@ namespace eCommerce.DataAccess.Repositories
             }
 
             return product;
+        }
+
+        public async Task<Boolean> DeleteProduct(Guid productId)
+        {
+            Product? product = await _dbContext.Products.FindAsync(productId);
+
+            if (product is null)
+            {
+                return false;
+            }
+
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+            return true;
         }
     }
 }

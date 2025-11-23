@@ -8,14 +8,11 @@ namespace eCommerce.DataAccess
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddDataAccess(this IServiceCollection services)
         {
-            var connectionString = config.GetConnectionString("DefaultConnection");
-            services.AddDbContext<ApplicationDbContext>(options => options
-                .UseSqlServer(connectionString)
-            );
+            services.AddDbContext<ApplicationDbContext>();
 
-            services.AddSingleton<IProductsRepository, ProductsRepository>();
+            services.AddScoped<IProductsRepository, ProductsRepository>();
             return services;
         }
     }
