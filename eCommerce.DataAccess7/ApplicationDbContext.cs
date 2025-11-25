@@ -10,10 +10,5 @@ namespace eCommerce.DataAccess
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseMySQL("server=localhost;port=3306;database=ecommerce;user=root;password=admin");
-        }
     }
 }

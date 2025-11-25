@@ -1,3 +1,4 @@
+using eCommerce.API.Middleware;
 using eCommerce.BusinessLogic;
 using eCommerce.BusinessLogic.Mappers;
 using eCommerce.DataAccess;
@@ -5,7 +6,7 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDataAccess();
+builder.Services.AddDataAccess(builder.Configuration);
 builder.Services.AddBusinessLogic();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -32,12 +33,17 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
+app.UseExceptionHandlingMiddleware();
 app.UseRouting();
+
 app.UseSwagger();
 app.UseSwaggerUI();
+
 app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
